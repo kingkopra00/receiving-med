@@ -3,205 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محضر استلام ادوية</title>
+    <title>محضر استلام أدوية ومستلزمات طبية</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
-
+        /* =========================================
+           1. إعدادات الخطوط والتنسيق الأساسي (الخطوط المحلية كبديل)
+           ========================================= */
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        
         :root {
-            --primary-color: #0056b3;
-            --bg-color: #e9ecef;
-            --border-color: #ccc;
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #2980b9;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+            --surface: #ffffff;
+            --border: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
+            /* دعم خطوط النظام كبديل في حال انقطاع الإنترنت */
+            font-family: 'Tajawal', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            line-height: 1.6;
+        }
+
+        /* =========================================
+           2. تخطيط الشاشة (مقسمة إلى لوحة تحكم ومعاينة)
+           ========================================= */
+        .app-container {
             display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* تنسيق قسم الإدخال */
-        .controls-section {
-            width: 35%;
-            background: white;
+            gap: 20px;
             padding: 20px;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-            overflow-y: auto;
-            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
         }
 
-        .controls-section h2 { margin-top: 0; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
-        .form-group input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-family: 'Tajawal', sans-serif; box-sizing: border-box; }
-        .btn { background-color: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-family: 'Tajawal', sans-serif; font-weight: bold; width: 100%; margin-top: 10px; }
-        .btn-print { background-color: #28a745; font-size: 16px; margin-top: 20px; }
+        /* لوحة الإدخال والتحكم */
+        .control-panel {
+            flex: 0 0 350px;
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: fit-content;
+        }
+
+        .control-panel h2 {
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group textarea {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            transition: background 0.3s;
+        }
+
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: #2471a3; }
         
-        .input-row { display: flex; gap: 10px; background: #f9f9f9; padding: 10px; border: 1px dashed var(--border-color); border-radius: 5px; margin-bottom: 15px; flex-wrap: wrap; }
-        .input-row .form-group { flex: 1; min-width: 120px; margin-bottom: 0; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #c0392b; }
 
-        /* تنسيق قسم المعاينة */
-        .preview-section {
-            width: 65%;
-            padding: 20px;
-            overflow-y: auto;
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .actions .btn { flex: 1; }
+
+        /* =========================================
+           3. منطقة المعاينة (ورقة A4)
+           ========================================= */
+        .preview-panel {
+            flex: 1;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            background-color: #525659; /* لون خلفية مثل قارئ الـ PDF */
+            overflow-y: auto;
         }
 
-        /* الورقة الرسمية وحجمها الثابت A4 */
-        .page {
+        .a4-paper {
             width: 210mm;
-            height: 297mm; /* مقاس A4 القياسي */
+            min-height: 297mm;
             background: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            box-sizing: border-box;
-            padding: 20mm 15mm; /* هوامش الورقة */
+            padding: 20mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
-            overflow: hidden; /* منع تجاوز المحتوى */
         }
 
-        /* الحاوي الداخلي الذي سيتم تصغيره عند الحاجة */
-        .page-inner {
+        .a4-header {
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .a4-header h1 { font-size: 1.5rem; text-decoration: underline; margin-bottom: 15px;}
+        .a4-header p { font-size: 1.1rem; font-weight: bold;}
+
+        /* الجدول الديناميكي */
+        table {
             width: 100%;
-            transform-origin: top center;
-            transition: transform 0.2s ease-out;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 1rem;
         }
 
-        /* تنسيق الترويسة (الهيدر) المعدل */
-        .header-container {
-            display: flex;
-            justify-content: space-between; /* يفصل بين جهة اليمين واليسار */
-            align-items: flex-start;
-            margin-bottom: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            line-height: 1.5;
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
         }
 
-        .header-right { text-align: right; }
-        .header-left { text-align: right; } /* النص داخل المربع محاذاة لليمين لكن المربع نفسه في اليسار */
+        th { background-color: #f0f0f0; font-weight: bold; }
 
-        .report-title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 20px; text-decoration: underline; }
-        .paragraph { text-align: justify; margin-bottom: 15px; font-weight: 500; font-size: 16px; line-height: 1.6; }
-
-        /* الجدول */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-weight: bold; font-size: 15px; table-layout: fixed; }
-        th, td { border: 1px solid black; padding: 8px; text-align: center; word-wrap: break-word; }
-        th { background-color: #f2f2f2; }
-
-        /* التواقيع */
+        /* منطقة التواقيع */
         .signatures {
             display: flex;
-            justify-content: space-between;
-            margin-top: 60px; /* مسافة ثابتة لتجنب التصغير الخاطئ */
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .sign-box { width: 45%; text-align: center; line-height: 1.8; }
-
-        /* تحسينات لشاشات الهواتف (الموبايل) */
-        @media (max-width: 768px) {
-            body { flex-direction: column; overflow: auto; }
-            .controls-section { width: 100%; height: auto; max-height: 50vh; }
-            .preview-section { width: 100%; overflow: visible; padding: 10px; }
-            .page { 
-                /* تصغير العرض ليلائم شاشة الموبايل بصرياً فقط دون التأثير على الطباعة */
-                transform: scale(0.45); 
-                transform-origin: top center; 
-                margin-bottom: -150mm; /* تعويض المسافة المفقودة بعد التصغير البصري */
-            }
+            justify-content: space-around;
+            margin-top: 50px;
+            page-break-inside: avoid; /* منع انقسام التواقيع بين صفحتين */
         }
 
-        /* تنسيقات الطباعة والتصدير */
+        .signature-box {
+            text-align: center;
+            width: 30%;
+        }
+        .signature-box p { margin-top: 40px; font-weight: bold; }
+
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* =========================================
+           4. إعدادات الطباعة الآمنة والمتوافقة
+           ========================================= */
         @media print {
-            body { background: white; height: auto; overflow: visible; display: block; }
-            .controls-section { display: none !important; }
-            .preview-section { width: 100%; padding: 0; display: block; background: none; }
-            .page { 
-                width: 210mm; height: 297mm; box-shadow: none; margin: 0; padding: 20mm 15mm; 
-                transform: scale(1) !important; /* إلغاء تصغير الموبايل عند الطباعة */
-                page-break-after: avoid; 
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
             }
+            .control-panel, .delete-btn, .no-print {
+                display: none !important;
+            }
+            .app-container {
+                display: block;
+                padding: 0;
+                max-width: 100%;
+            }
+            .preview-panel {
+                display: block;
+                overflow: visible;
+            }
+            .a4-paper {
+                width: 100%;
+                min-height: auto;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+            /* ترك المتصفح يدير الصفحات بناءً على المحتوى */
+            tr { page-break-inside: avoid; }
+        }
+
+        /* التجاوب مع الشاشات الصغيرة */
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; }
+            .control-panel { flex: none; width: 100%; }
+            .a4-paper { width: 100%; padding: 10mm; }
         }
     </style>
 </head>
 <body>
 
-    <div class="controls-section no-print">
-        <h2>إعداد المحضر</h2>
-        
-        <div class="form-group">
-            <label>العدد:</label>
-            <input type="text" id="docNum" placeholder="أدخل العدد" oninput="updateDoc()">
-        </div>
-        <div class="form-group">
-            <label>التاريخ:</label>
-            <input type="text" id="docDate" placeholder="مثال: 2026/2/20" oninput="updateDoc()">
-        </div>
-
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
-        <h3>إضافة القوائم</h3>
-
-        <div class="input-row">
+    <div class="app-container">
+        <aside class="control-panel no-print">
+            <h2>إعدادات المحضر الأساسية</h2>
+            
             <div class="form-group">
-                <label>رقم القائمة:</label>
-                <input type="text" id="invNum">
+                <label for="deptName">اسم الدائرة / الجهة:</label>
+                <input type="text" id="deptName" value="دائرة صحة القادسية" placeholder="مثال: دائرة صحة بغداد">
             </div>
+            
             <div class="form-group">
-                <label>تاريخ القائمة:</label>
-                <input type="text" id="invDate">
+                <label for="orderNum">رقم الأمر الإداري:</label>
+                <input type="text" id="orderNum" placeholder="مثال: 1234">
             </div>
+
             <div class="form-group">
-                <label>تاريخ الاستلام:</label>
-                <input type="text" id="recDate">
+                <label for="orderDate">تاريخ الأمر الإداري:</label>
+                <input type="date" id="orderDate">
             </div>
-            <button class="btn" onclick="addRow()">إضافة للجدول</button>
-        </div>
 
-        <button class="btn btn-print" onclick="window.print()">🖨️ طباعة / حفظ كملف PDF</button>
-        <button class="btn" style="background: #dc3545;" onclick="clearTable()">🗑️ مسح جميع القوائم</button>
-    </div>
+            <h2>إضافة قائمة (فاتورة)</h2>
+            <form id="invoiceForm">
+                <div class="form-group">
+                    <label for="invNum">رقم القائمة:</label>
+                    <input type="text" id="invNum" required autocomplete="off">
+                </div>
 
-    <div class="preview-section">
-        <div class="page">
-            <div class="page-inner" id="pageInner">
+                <div class="form-group">
+                    <label for="invDate">تاريخ القائمة:</label>
+                    <input type="date" id="invDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="recDate">تاريخ الاستلام:</label>
+                    <input type="date" id="recDate" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px; width: 100%;">إضافة للجدول</button>
+            </form>
+
+            <div class="actions">
+                <button type="button" class="btn btn-outline" id="printBtn">🖨️ طباعة (PDF)</button>
+                <button type="button" class="btn btn-danger" id="clearBtn">🗑️ مسح الكل</button>
+            </div>
+        </aside>
+
+        <main class="preview-panel">
+            <div class="a4-paper" id="printableArea">
                 
-                <div class="header-container">
-                    <div class="header-right">
-                        جمهورية العراق<br>
-                        وزارة الصحة / دائرة صحة المثنى<br>
-                        قسم الصيدلة / لجنة استلام الادوية
-                    </div>
-                    <div class="header-left">
-                        العدد : <span id="outNum"></span><br>
-                        التاريخ : <span id="outDate"></span>
-                    </div>
+                <div class="a4-header">
+                    <p>جمهورية العراق</p>
+                    <p>وزارة الصحة / <span id="outDeptName">دائرة صحة القادسية</span></p>
+                    <h1>محضر استلام</h1>
+                    <p>
+                        إشارة إلى الأمر الإداري المرقم (<span id="outOrderNum">---</span>) 
+                        في (<span id="outOrderDate">---</span>)، قامت اللجنة أدناه باستلام القوائم المبينة تفاصيلها:
+                    </p>
                 </div>
 
-                <div class="report-title">
-                    محضر استلام ادوية
-                </div>
-
-                <div class="paragraph">
-                    إشارة الى الامر الإداري ذي العدد 2259 و صادر بتاريخ 2025/11/5 والصادر من دائرة صحة المثنى / قسم الصيدلة / مكتب إدارة القسم والخاص بتشكيل لجنة استلام الادوية و المستلزمات الطبية و المختبرية.
-                </div>
-
-                <div class="paragraph">
-                    نؤيد مطابقة المستلم من المواد مع سندات الاستلام ادناه بشكل رسمي من حيث (نوعية المواد المستلمة وكمياتها و رقم الوجبة و اسم الشركة و تاريخ النفاذ) و سلامة المواد المستلمة من (التلف و انتهاء المفعول و مطابقتها لظروف النقل الجيد) بشكل كامل.
-                </div>
-
-                <table id="reportTable">
+                <table id="mainTable">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">رقم القائمة</th>
-                            <th style="width: 37.5%;">تاريخ القائمة</th>
-                            <th style="width: 37.5%;">تاريخ الاستلام</th>
+                            <th width="10%">ت</th>
+                            <th width="30%">رقم القائمة</th>
+                            <th width="30%">تاريخ القائمة</th>
+                            <th width="30%">تاريخ الاستلام</th>
+                            <th class="no-print" width="10%">إجراء</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -209,75 +303,188 @@
                 </table>
 
                 <div class="signatures">
-                    <div class="sign-box">
-                        الصيدلاني<br>
-                        علي محمد حسن<br>
-                        رئيس لجنة استلام الادوية
+                    <div class="signature-box">
+                        <span>عضو اللجنة</span>
+                        <p>الاسم والتوقيع</p>
                     </div>
-                    <div class="sign-box">
-                        المحاسب<br>
-                        محمد ثامر جبار<br>
-                        عضو لجنة استلام
+                    <div class="signature-box">
+                        <span>عضو اللجنة</span>
+                        <p>الاسم والتوقيع</p>
+                    </div>
+                    <div class="signature-box">
+                        <span>رئيس اللجنة</span>
+                        <p>الاسم والتوقيع</p>
                     </div>
                 </div>
 
             </div>
-        </div>
+        </main>
     </div>
 
     <script>
-        // تحديث الحقول فورياً
-        function updateDoc() {
-            document.getElementById('outNum').innerText = document.getElementById('docNum').value;
-            document.getElementById('outDate').innerText = document.getElementById('docDate').value;
-        }
+        /**
+         * =========================================
+         * المنطق البرمجي (JavaScript)
+         * =========================================
+         */
 
-        // الدالة المحدثة للتحجيم التلقائي (أكثر دقة واستقراراً)
-        function adjustPageScale() {
-            const pageInner = document.getElementById('pageInner');
-            pageInner.style.transform = 'scale(1)'; // إعادة الحجم للطبيعي أولاً
+        // 1. إدارة الحالة (State Management)
+        let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+
+        // 2. ربط عناصر DOM
+        const form = document.getElementById('invoiceForm');
+        const tbody = document.getElementById('tableBody');
+        const printBtn = document.getElementById('printBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        // عناصر الإعدادات الديناميكية
+        const inputs = {
+            deptName: document.getElementById('deptName'),
+            orderNum: document.getElementById('orderNum'),
+            orderDate: document.getElementById('orderDate')
+        };
+        const outputs = {
+            deptName: document.getElementById('outDeptName'),
+            orderNum: document.getElementById('outOrderNum'),
+            orderDate: document.getElementById('outOrderDate')
+        };
+
+        // 3. تحديث الإعدادات ديناميكياً وحفظها
+        function updateHeaders() {
+            outputs.deptName.textContent = inputs.deptName.value.trim() || '---';
+            outputs.orderNum.textContent = inputs.orderNum.value.trim() || '---';
+            outputs.orderDate.textContent = inputs.orderDate.value || '---';
             
-            setTimeout(() => {
-                // مقاس A4 الصافي بالبكسل تقريباً 960px (بعد طرح الهوامش)
-                const maxAllowedHeight = 960; 
-                const currentHeight = pageInner.scrollHeight;
-
-                if (currentHeight > maxAllowedHeight) {
-                    const scaleRatio = maxAllowedHeight / currentHeight;
-                    // تطبيق نسبة التصغير لضمان عدم تجاوز الصفحة الواحدة
-                    pageInner.style.transform = `scale(${scaleRatio})`;
-                }
-            }, 50); // تأخير بسيط جداً للسماح للمتصفح برسم الجدول الجديد
+            // حفظ الإعدادات في LocalStorage
+            const settings = {
+                dept: inputs.deptName.value,
+                order: inputs.orderNum.value,
+                date: inputs.orderDate.value
+            };
+            localStorage.setItem('docSettings', JSON.stringify(settings));
         }
 
-        // إضافة صف
-        function addRow() {
-            const invNum = document.getElementById('invNum').value;
+        // استرجاع الإعدادات عند التحميل
+        function loadSettings() {
+            const saved = JSON.parse(localStorage.getItem('docSettings'));
+            if(saved) {
+                inputs.deptName.value = saved.dept || '';
+                inputs.orderNum.value = saved.order || '';
+                inputs.orderDate.value = saved.date || '';
+            }
+            updateHeaders();
+        }
+
+        // إضافة مستمعي الأحداث للإعدادات
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', updateHeaders);
+        });
+
+        // 4. بناء الجدول بأمان (تجنب innerHTML)
+        function renderTable() {
+            tbody.innerHTML = ''; // تفريغ الجدول الحالي
+            
+            invoices.forEach((inv, index) => {
+                const tr = document.createElement('tr');
+                
+                // التسلسل
+                const tdIndex = document.createElement('td');
+                tdIndex.textContent = index + 1;
+                tr.appendChild(tdIndex);
+
+                // رقم القائمة
+                const tdNum = document.createElement('td');
+                tdNum.textContent = inv.num;
+                tr.appendChild(tdNum);
+
+                // تاريخ القائمة
+                const tdInvDate = document.createElement('td');
+                tdInvDate.textContent = inv.invDate;
+                tr.appendChild(tdInvDate);
+
+                // تاريخ الاستلام
+                const tdRecDate = document.createElement('td');
+                tdRecDate.textContent = inv.recDate;
+                tr.appendChild(tdRecDate);
+
+                // زر الحذف (لا يظهر في الطباعة)
+                const tdAction = document.createElement('td');
+                tdAction.className = 'no-print';
+                const delBtn = document.createElement('button');
+                delBtn.textContent = 'حذف';
+                delBtn.className = 'delete-btn';
+                delBtn.addEventListener('click', () => deleteInvoice(index));
+                tdAction.appendChild(delBtn);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
+
+            // حفظ في LocalStorage
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+        }
+
+        // 5. إضافة قائمة جديدة (مع التحقق)
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // منع إعادة تحميل الصفحة
+
+            const num = document.getElementById('invNum').value.trim();
             const invDate = document.getElementById('invDate').value;
             const recDate = document.getElementById('recDate').value;
 
-            if(!invNum) { alert("يرجى إدخال رقم القائمة"); return; }
+            // التحقق من عدم تكرار رقم القائمة
+            const isDuplicate = invoices.some(inv => inv.num === num);
+            if (isDuplicate) {
+                alert('خطأ: رقم القائمة هذا موجود مسبقاً في الجدول!');
+                return;
+            }
 
-            const tbody = document.getElementById('tableBody');
-            const row = document.createElement('tr');
-            
-            row.innerHTML = `<td>${invNum}</td><td>${invDate}</td><td>${recDate}</td>`;
-            tbody.appendChild(row);
+            // التحقق المنطقي للتواريخ (تاريخ الاستلام لا يمكن أن يكون قبل تاريخ القائمة)
+            if(new Date(recDate) < new Date(invDate)) {
+                alert('خطأ: تاريخ الاستلام لا يمكن أن يكون أقدم من تاريخ القائمة!');
+                return;
+            }
 
+            invoices.push({ num, invDate, recDate });
+            renderTable();
+
+            // تصفير الحقول للجاهزية للإدخال التالي
             document.getElementById('invNum').value = '';
-            document.getElementById('invDate').value = '';
-            document.getElementById('recDate').value = '';
             document.getElementById('invNum').focus();
+        });
 
-            adjustPageScale();
-        }
-
-        function clearTable() {
-            if(confirm("مسح جميع القوائم؟")) {
-                document.getElementById('tableBody').innerHTML = '';
-                adjustPageScale();
+        // 6. حذف قائمة
+        function deleteInvoice(index) {
+            if(confirm('هل أنت متأكد من حذف هذا السطر؟')) {
+                invoices.splice(index, 1);
+                renderTable();
             }
         }
+
+        // 7. مسح الكل
+        clearBtn.addEventListener('click', () => {
+            if(invoices.length === 0) return;
+            if(confirm('تحذير: سيتم مسح جميع البيانات من الجدول. هل أنت متأكد؟')) {
+                invoices = [];
+                renderTable();
+            }
+        });
+
+        // 8. الطباعة
+        printBtn.addEventListener('click', () => {
+            if(invoices.length === 0) {
+                alert('الجدول فارغ! يرجى إضافة بيانات قبل الطباعة.');
+                return;
+            }
+            window.print();
+        });
+
+        // التهيئة عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            renderTable();
+        });
+
     </script>
 </body>
 </html>
