@@ -68,19 +68,17 @@
             background-color: #525659;
         }
 
-        /* حاوية الورقة بحجم A4 صارم */
         .page {
             width: 210mm;
-            height: 297mm; /* ارتفاع ثابت لمنع تعدد الصفحات */
+            height: 297mm;
             background: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             box-sizing: border-box;
             padding: 15mm;
             position: relative;
-            overflow: hidden; /* إخفاء أي شيء يتجاوز الصفحة لتجنب الطباعة على صفحتين */
+            overflow: hidden;
         }
 
-        /* المحتوى الداخلي الذي يتم تصغيره برمجياً */
         .page-content {
             width: 100%;
             transform-origin: top center;
@@ -106,24 +104,17 @@
             body { flex-direction: column; overflow: auto; }
             .controls-section { width: 100%; height: auto; border-bottom: 3px solid var(--primary-color); }
             .preview-section { width: 100%; overflow: visible; padding: 10px; }
-            /* تصغير بصري على شاشة الموبايل فقط لمشاهدة الورقة بالكامل */
             .page { transform: scale(0.48); transform-origin: top center; margin-bottom: -150mm; }
         }
 
-        /* --- تنسيقات الطباعة (ورقة واحدة فقط) --- */
+        /* --- تنسيقات الطباعة --- */
         @media print {
             body { background: white; height: 100vh; overflow: hidden; display: block; }
             .controls-section { display: none !important; }
             .preview-section { width: 100%; padding: 0; display: block; background: none; }
             .page { 
-                width: 210mm;
-                height: 297mm; /* التزام صارم بصفحة واحدة */
-                box-shadow: none; 
-                margin: 0; 
-                padding: 15mm; 
-                transform: scale(1) !important; /* إلغاء تصغير الموبايل */
-                page-break-after: avoid; 
-                page-break-inside: avoid;
+                width: 210mm; height: 297mm; box-shadow: none; margin: 0; padding: 15mm; 
+                transform: scale(1) !important; page-break-after: avoid; page-break-inside: avoid;
             }
             .hide-on-print { display: none !important; }
         }
@@ -175,10 +166,6 @@
                 <label for="invDate">تاريخ القائمة:</label>
                 <input type="date" id="invDate" required>
             </div>
-            <div class="form-group">
-                <label for="recDate">تاريخ الاستلام:</label>
-                <input type="date" id="recDate" required>
-            </div>
             <button type="submit" class="btn">➕ إضافة للجدول</button>
         </form>
 
@@ -217,15 +204,14 @@
                 <table id="reportTable">
                     <thead>
                         <tr>
-                            <th style="width: 10%;">ت</th>
-                            <th style="width: 25%;">رقم القائمة</th>
-                            <th style="width: 30%;">تاريخ القائمة</th>
-                            <th style="width: 30%;">تاريخ الاستلام</th>
+                            <th style="width: 15%;">ت</th>
+                            <th style="width: 40%;">رقم القائمة</th>
+                            <th style="width: 40%;">تاريخ القائمة</th>
                             <th style="width: 5%;" class="hide-on-print"></th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        </tbody>
+                    </tbody>
                 </table>
 
                 <div class="signatures">
@@ -253,7 +239,7 @@
             },
             
             init() {
-                const savedData = localStorage.getItem('pharmacyReportData');
+                const savedData = localStorage.getItem('pharmacyReportData_noRec');
                 if (savedData) {
                     try { this.data = JSON.parse(savedData); } catch (e) {}
                 }
@@ -262,7 +248,7 @@
                 window.addEventListener('resize', () => this.adjustScale());
             },
 
-            save() { localStorage.setItem('pharmacyReportData', JSON.stringify(this.data)); },
+            save() { localStorage.setItem('pharmacyReportData_noRec', JSON.stringify(this.data)); },
 
             updateMetaData() {
                 const fields = ['docNum', 'docDate', 'adminOrderNum', 'adminOrderDate', 'signerRight', 'signerLeft'];
@@ -297,12 +283,11 @@
                 });
 
                 document.getElementById('btnPrint').addEventListener('click', () => {
-                    if (this.data.invoices.length === 0 && !confirm("لم تقم بإضافة قوائم. طباعة فارغ؟")) return;
                     window.print();
                 });
 
                 document.getElementById('btnClear').addEventListener('click', () => {
-                    if (confirm('مسح كافة البيانات؟')) {
+                    if (confirm('هل أنت متأكد من مسح كافة البيانات؟')) {
                         this.data.invoices = [];
                         this.save();
                         this.render();
@@ -313,12 +298,10 @@
             addInvoice() {
                 const invNumInput = document.getElementById('invNum');
                 const invDateInput = document.getElementById('invDate');
-                const recDateInput = document.getElementById('recDate');
 
                 const newInvoice = {
                     invNum: invNumInput.value.trim(),
-                    invDate: invDateInput.value.trim(),
-                    recDate: recDateInput.value.trim()
+                    invDate: invDateInput.value.trim()
                 };
 
                 if (this.data.invoices.some(inv => inv.invNum === newInvoice.invNum)) {
@@ -330,16 +313,14 @@
                 this.save();
                 this.renderTable();
 
-                invNumInput.value = ''; invDateInput.value = ''; recDateInput.value = '';
+                invNumInput.value = ''; invDateInput.value = '';
                 invNumInput.focus();
             },
 
             removeInvoice(index) {
-                if (confirm('حذف هذه القائمة؟')) {
-                    this.data.invoices.splice(index, 1);
-                    this.save();
-                    this.renderTable();
-                }
+                this.data.invoices.splice(index, 1);
+                this.save();
+                this.renderTable();
             },
 
             renderMetaData() {
@@ -362,11 +343,15 @@
                     tdIndex.textContent = index + 1;
                     tr.appendChild(tdIndex);
 
-                    ['invNum', 'invDate', 'recDate'].forEach(key => {
-                        const td = document.createElement('td');
-                        td.textContent = key.includes('Date') ? this.formatDate(invoice[key]) : invoice[key];
-                        tr.appendChild(td);
-                    });
+                    // عمود رقم القائمة
+                    const tdNum = document.createElement('td');
+                    tdNum.textContent = invoice.invNum;
+                    tr.appendChild(tdNum);
+
+                    // عمود تاريخ القائمة
+                    const tdDate = document.createElement('td');
+                    tdDate.textContent = this.formatDate(invoice.invDate);
+                    tr.appendChild(tdDate);
 
                     const tdAction = document.createElement('td');
                     tdAction.className = 'hide-on-print';
@@ -383,24 +368,18 @@
                 this.adjustScale();
             },
 
-            // دالة التصغير للحفاظ على المحتوى في صفحة واحدة
             adjustScale() {
                 const pageContent = document.getElementById('pageContent');
                 const pageArea = document.getElementById('printArea');
-                
-                // إعادة الحجم للطبيعي لحساب الارتفاع الفعلي
                 pageContent.style.transform = 'scale(1)';
                 
                 setTimeout(() => {
-                    // حساب الارتفاع المتاح داخل الورقة بعد خصم الهوامش العلوية والسفلية (15mm + 15mm = ~114px)
                     const computedStyle = window.getComputedStyle(pageArea);
                     const paddingTop = parseFloat(computedStyle.paddingTop);
                     const paddingBottom = parseFloat(computedStyle.paddingBottom);
                     const availableHeight = pageArea.clientHeight - paddingTop - paddingBottom;
-                    
                     const actualHeight = pageContent.scrollHeight;
 
-                    // إذا كان المحتوى أكبر من الصفحة، صغره ليتناسب تماماً
                     if (actualHeight > availableHeight) {
                         const scaleRatio = availableHeight / actualHeight;
                         pageContent.style.transform = `scale(${scaleRatio})`;
