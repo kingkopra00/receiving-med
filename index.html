@@ -3,299 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محضر استلام أدوية ومستلزمات طبية</title>
+    <title>محضر استلام ادوية</title>
     <style>
-        /* =========================================
-           1. إعدادات الخطوط والتنسيق الأساسي (الخطوط المحلية كبديل)
-           ========================================= */
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
-        
-        :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --accent: #2980b9;
-            --danger: #e74c3c;
-            --bg: #f4f7f6;
-            --surface: #ffffff;
-            --border: #ddd;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #ecf0f1;
+            --border-color: #bdc3c7;
+            --danger-color: #e74c3c;
         }
 
         body {
-            /* دعم خطوط النظام كبديل في حال انقطاع الإنترنت */
-            font-family: 'Tajawal', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
-            color: var(--primary);
-            line-height: 1.6;
+            font-family: 'Tajawal', Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* =========================================
-           2. تخطيط الشاشة (مقسمة إلى لوحة تحكم ومعاينة)
-           ========================================= */
-        .app-container {
-            display: flex;
-            gap: 20px;
+        /* --- قسم لوحة التحكم --- */
+        .controls-section {
+            width: 35%;
+            background: white;
             padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: 100vh;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            z-index: 10;
         }
 
-        /* لوحة الإدخال والتحكم */
-        .control-panel {
-            flex: 0 0 350px;
-            background: var(--surface);
+        .controls-section h2, .controls-section h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 14px; }
+        .form-group input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; box-sizing: border-box; }
+        .form-group input:focus { border-color: var(--accent-color); outline: none; }
+
+        .btn { background-color: var(--accent-color); color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-family: inherit; font-weight: bold; width: 100%; margin-top: 5px; }
+        .btn:hover { background-color: #2980b9; }
+        .btn-print { background-color: #27ae60; font-size: 16px; margin-top: 20px; }
+        .btn-print:hover { background-color: #219653; }
+        .btn-danger { background-color: var(--danger-color); }
+        .btn-danger:hover { background-color: #c0392b; }
+
+        .input-row { display: flex; gap: 10px; background: #f8f9fa; padding: 12px; border: 1px dashed var(--border-color); border-radius: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .input-row .form-group { flex: 1; min-width: 120px; margin-bottom: 0; }
+
+        /* --- قسم المعاينة (الورقة A4) --- */
+        .preview-section {
+            width: 65%;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            height: fit-content;
-        }
-
-        .control-panel h2 {
-            font-size: 1.2rem;
-            border-bottom: 2px solid var(--accent);
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .form-group label {
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .form-group input, .form-group textarea {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
-        }
-
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: inherit;
-            transition: background 0.3s;
-        }
-
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: #2471a3; }
-        
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover { background: #c0392b; }
-
-        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        .btn-outline:hover { background: var(--primary); color: white; }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .actions .btn { flex: 1; }
-
-        /* =========================================
-           3. منطقة المعاينة (ورقة A4)
-           ========================================= */
-        .preview-panel {
-            flex: 1;
+            overflow-y: auto;
             display: flex;
             justify-content: center;
-            overflow-y: auto;
+            align-items: flex-start;
+            background-color: #525659;
         }
 
-        .a4-paper {
+        /* حاوية الورقة بحجم A4 صارم */
+        .page {
             width: 210mm;
-            min-height: 297mm;
+            height: 297mm; /* ارتفاع ثابت لمنع تعدد الصفحات */
             background: white;
-            padding: 20mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            padding: 15mm;
             position: relative;
+            overflow: hidden; /* إخفاء أي شيء يتجاوز الصفحة لتجنب الطباعة على صفحتين */
         }
 
-        .a4-header {
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.8;
-        }
-
-        .a4-header h1 { font-size: 1.5rem; text-decoration: underline; margin-bottom: 15px;}
-        .a4-header p { font-size: 1.1rem; font-weight: bold;}
-
-        /* الجدول الديناميكي */
-        table {
+        /* المحتوى الداخلي الذي يتم تصغيره برمجياً */
+        .page-content {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            font-size: 1rem;
+            transform-origin: top center;
+            transition: transform 0.2s ease-out;
         }
 
-        th, td {
-            border: 1px solid #000;
-            padding: 10px;
-            text-align: center;
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; font-size: 16px; font-weight: bold; line-height: 1.5; }
+        .header-right, .header-left { text-align: right; }
+        .report-title { text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 20px; text-decoration: underline; }
+        .paragraph { text-align: justify; margin-bottom: 15px; font-weight: 500; font-size: 16px; line-height: 1.6; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-weight: bold; font-size: 15px; }
+        th, td { border: 1px solid black; padding: 8px; text-align: center; word-wrap: break-word; }
+        th { background-color: #f2f2f2; }
+
+        .row-action { color: var(--danger-color); cursor: pointer; font-size: 18px; border: none; background: none; padding: 0; }
+
+        .signatures { display: flex; justify-content: space-between; margin-top: 60px; font-weight: bold; font-size: 16px; }
+        .sign-box { width: 45%; text-align: center; line-height: 1.8; }
+
+        /* --- تحسينات الموبايل --- */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; }
+            .controls-section { width: 100%; height: auto; border-bottom: 3px solid var(--primary-color); }
+            .preview-section { width: 100%; overflow: visible; padding: 10px; }
+            /* تصغير بصري على شاشة الموبايل فقط لمشاهدة الورقة بالكامل */
+            .page { transform: scale(0.48); transform-origin: top center; margin-bottom: -150mm; }
         }
 
-        th { background-color: #f0f0f0; font-weight: bold; }
-
-        /* منطقة التواقيع */
-        .signatures {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 50px;
-            page-break-inside: avoid; /* منع انقسام التواقيع بين صفحتين */
-        }
-
-        .signature-box {
-            text-align: center;
-            width: 30%;
-        }
-        .signature-box p { margin-top: 40px; font-weight: bold; }
-
-        .delete-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        /* =========================================
-           4. إعدادات الطباعة الآمنة والمتوافقة
-           ========================================= */
+        /* --- تنسيقات الطباعة (ورقة واحدة فقط) --- */
         @media print {
-            body {
-                background: white;
-                margin: 0;
-                padding: 0;
+            body { background: white; height: 100vh; overflow: hidden; display: block; }
+            .controls-section { display: none !important; }
+            .preview-section { width: 100%; padding: 0; display: block; background: none; }
+            .page { 
+                width: 210mm;
+                height: 297mm; /* التزام صارم بصفحة واحدة */
+                box-shadow: none; 
+                margin: 0; 
+                padding: 15mm; 
+                transform: scale(1) !important; /* إلغاء تصغير الموبايل */
+                page-break-after: avoid; 
+                page-break-inside: avoid;
             }
-            .control-panel, .delete-btn, .no-print {
-                display: none !important;
-            }
-            .app-container {
-                display: block;
-                padding: 0;
-                max-width: 100%;
-            }
-            .preview-panel {
-                display: block;
-                overflow: visible;
-            }
-            .a4-paper {
-                width: 100%;
-                min-height: auto;
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 15mm;
-            }
-            /* ترك المتصفح يدير الصفحات بناءً على المحتوى */
-            tr { page-break-inside: avoid; }
-        }
-
-        /* التجاوب مع الشاشات الصغيرة */
-        @media (max-width: 900px) {
-            .app-container { flex-direction: column; }
-            .control-panel { flex: none; width: 100%; }
-            .a4-paper { width: 100%; padding: 10mm; }
+            .hide-on-print { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <aside class="control-panel no-print">
-            <h2>إعدادات المحضر الأساسية</h2>
-            
+    <div class="controls-section hide-on-print">
+        <h2>إعداد المحضر</h2>
+        
+        <div class="form-group">
+            <label for="docNum">العدد:</label>
+            <input type="text" id="docNum" placeholder="أدخل العدد">
+        </div>
+        <div class="form-group">
+            <label for="docDate">التاريخ:</label>
+            <input type="date" id="docDate">
+        </div>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+        
+        <h3>البيانات الإدارية</h3>
+        <div class="form-group">
+            <label for="adminOrderNum">رقم الأمر الإداري:</label>
+            <input type="text" id="adminOrderNum" value="2259">
+        </div>
+        <div class="form-group">
+            <label for="adminOrderDate">تاريخ الأمر الإداري:</label>
+            <input type="date" id="adminOrderDate" value="2025-11-05">
+        </div>
+        <div class="form-group">
+            <label for="signerRight">اسم رئيس اللجنة (الصيدلاني):</label>
+            <input type="text" id="signerRight" value="علي محمد حسن">
+        </div>
+        <div class="form-group">
+            <label for="signerLeft">اسم عضو اللجنة (المحاسب):</label>
+            <input type="text" id="signerLeft" value="محمد ثامر جبار">
+        </div>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid var(--border-color);">
+        
+        <h3>إضافة القوائم</h3>
+        <form id="addListForm" class="input-row">
             <div class="form-group">
-                <label for="deptName">اسم الدائرة / الجهة:</label>
-                <input type="text" id="deptName" value="دائرة صحة القادسية" placeholder="مثال: دائرة صحة بغداد">
+                <label for="invNum">رقم القائمة:</label>
+                <input type="text" id="invNum" required>
             </div>
-            
             <div class="form-group">
-                <label for="orderNum">رقم الأمر الإداري:</label>
-                <input type="text" id="orderNum" placeholder="مثال: 1234">
+                <label for="invDate">تاريخ القائمة:</label>
+                <input type="date" id="invDate" required>
             </div>
-
             <div class="form-group">
-                <label for="orderDate">تاريخ الأمر الإداري:</label>
-                <input type="date" id="orderDate">
+                <label for="recDate">تاريخ الاستلام:</label>
+                <input type="date" id="recDate" required>
             </div>
+            <button type="submit" class="btn">➕ إضافة للجدول</button>
+        </form>
 
-            <h2>إضافة قائمة (فاتورة)</h2>
-            <form id="invoiceForm">
-                <div class="form-group">
-                    <label for="invNum">رقم القائمة:</label>
-                    <input type="text" id="invNum" required autocomplete="off">
-                </div>
+        <button id="btnPrint" class="btn btn-print">🖨️ طباعة / تصدير PDF</button>
+        <button id="btnClear" class="btn btn-danger">🗑️ مسح جميع البيانات</button>
+    </div>
 
-                <div class="form-group">
-                    <label for="invDate">تاريخ القائمة:</label>
-                    <input type="date" id="invDate" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="recDate">تاريخ الاستلام:</label>
-                    <input type="date" id="recDate" required>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="margin-top: 10px; width: 100%;">إضافة للجدول</button>
-            </form>
-
-            <div class="actions">
-                <button type="button" class="btn btn-outline" id="printBtn">🖨️ طباعة (PDF)</button>
-                <button type="button" class="btn btn-danger" id="clearBtn">🗑️ مسح الكل</button>
-            </div>
-        </aside>
-
-        <main class="preview-panel">
-            <div class="a4-paper" id="printableArea">
+    <div class="preview-section">
+        <div class="page" id="printArea">
+            <div class="page-content" id="pageContent">
                 
-                <div class="a4-header">
-                    <p>جمهورية العراق</p>
-                    <p>وزارة الصحة / <span id="outDeptName">دائرة صحة القادسية</span></p>
-                    <h1>محضر استلام</h1>
-                    <p>
-                        إشارة إلى الأمر الإداري المرقم (<span id="outOrderNum">---</span>) 
-                        في (<span id="outOrderDate">---</span>)، قامت اللجنة أدناه باستلام القوائم المبينة تفاصيلها:
-                    </p>
+                <div class="header-container">
+                    <div class="header-right">
+                        جمهورية العراق<br>
+                        وزارة الصحة / دائرة صحة المثنى<br>
+                        قسم الصيدلة / لجنة استلام الادوية
+                    </div>
+                    <div class="header-left">
+                        العدد : <span id="outNum"></span><br>
+                        التاريخ : <span id="outDate"></span>
+                    </div>
                 </div>
 
-                <table id="mainTable">
+                <div class="report-title">
+                    محضر استلام ادوية
+                </div>
+
+                <div class="paragraph">
+                    إشارة الى الامر الإداري ذي العدد <span id="outAdminOrderNum"></span> وصادر بتاريخ <span id="outAdminOrderDate"></span> والصادر من دائرة صحة المثنى / قسم الصيدلة / مكتب إدارة القسم والخاص بتشكيل لجنة استلام الادوية والمستلزمات الطبية والمختبرية.
+                </div>
+
+                <div class="paragraph">
+                    نؤيد مطابقة المستلم من المواد مع سندات الاستلام بشكل رسمي من حيث (نوعية المواد المستلمة وكمياتها ورقم الوجبة واسم الشركة وتاريخ النفاذ) وسلامة المواد المستلمة من (التلف وانتهاء المفعول ومطابقتها لظروف النقل الجيد) بشكل كامل.
+                </div>
+
+                <table id="reportTable">
                     <thead>
                         <tr>
-                            <th width="10%">ت</th>
-                            <th width="30%">رقم القائمة</th>
-                            <th width="30%">تاريخ القائمة</th>
-                            <th width="30%">تاريخ الاستلام</th>
-                            <th class="no-print" width="10%">إجراء</th>
+                            <th style="width: 10%;">ت</th>
+                            <th style="width: 25%;">رقم القائمة</th>
+                            <th style="width: 30%;">تاريخ القائمة</th>
+                            <th style="width: 30%;">تاريخ الاستلام</th>
+                            <th style="width: 5%;" class="hide-on-print"></th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -303,188 +229,192 @@
                 </table>
 
                 <div class="signatures">
-                    <div class="signature-box">
-                        <span>عضو اللجنة</span>
-                        <p>الاسم والتوقيع</p>
+                    <div class="sign-box">
+                        الصيدلاني<br>
+                        <span id="outSignerRight"></span><br>
+                        رئيس لجنة استلام الادوية
                     </div>
-                    <div class="signature-box">
-                        <span>عضو اللجنة</span>
-                        <p>الاسم والتوقيع</p>
-                    </div>
-                    <div class="signature-box">
-                        <span>رئيس اللجنة</span>
-                        <p>الاسم والتوقيع</p>
+                    <div class="sign-box">
+                        المحاسب<br>
+                        <span id="outSignerLeft"></span><br>
+                        عضو لجنة استلام
                     </div>
                 </div>
 
             </div>
-        </main>
+        </div>
     </div>
 
     <script>
-        /**
-         * =========================================
-         * المنطق البرمجي (JavaScript)
-         * =========================================
-         */
-
-        // 1. إدارة الحالة (State Management)
-        let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
-
-        // 2. ربط عناصر DOM
-        const form = document.getElementById('invoiceForm');
-        const tbody = document.getElementById('tableBody');
-        const printBtn = document.getElementById('printBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        
-        // عناصر الإعدادات الديناميكية
-        const inputs = {
-            deptName: document.getElementById('deptName'),
-            orderNum: document.getElementById('orderNum'),
-            orderDate: document.getElementById('orderDate')
-        };
-        const outputs = {
-            deptName: document.getElementById('outDeptName'),
-            orderNum: document.getElementById('outOrderNum'),
-            orderDate: document.getElementById('outOrderDate')
-        };
-
-        // 3. تحديث الإعدادات ديناميكياً وحفظها
-        function updateHeaders() {
-            outputs.deptName.textContent = inputs.deptName.value.trim() || '---';
-            outputs.orderNum.textContent = inputs.orderNum.value.trim() || '---';
-            outputs.orderDate.textContent = inputs.orderDate.value || '---';
+        const AppState = {
+            data: {
+                docNum: '', docDate: '', adminOrderNum: '2259', adminOrderDate: '2025-11-05',
+                signerRight: 'علي محمد حسن', signerLeft: 'محمد ثامر جبار', invoices: []
+            },
             
-            // حفظ الإعدادات في LocalStorage
-            const settings = {
-                dept: inputs.deptName.value,
-                order: inputs.orderNum.value,
-                date: inputs.orderDate.value
-            };
-            localStorage.setItem('docSettings', JSON.stringify(settings));
-        }
+            init() {
+                const savedData = localStorage.getItem('pharmacyReportData');
+                if (savedData) {
+                    try { this.data = JSON.parse(savedData); } catch (e) {}
+                }
+                this.bindUI();
+                this.render();
+                window.addEventListener('resize', () => this.adjustScale());
+            },
 
-        // استرجاع الإعدادات عند التحميل
-        function loadSettings() {
-            const saved = JSON.parse(localStorage.getItem('docSettings'));
-            if(saved) {
-                inputs.deptName.value = saved.dept || '';
-                inputs.orderNum.value = saved.order || '';
-                inputs.orderDate.value = saved.date || '';
-            }
-            updateHeaders();
-        }
+            save() { localStorage.setItem('pharmacyReportData', JSON.stringify(this.data)); },
 
-        // إضافة مستمعي الأحداث للإعدادات
-        Object.values(inputs).forEach(input => {
-            input.addEventListener('input', updateHeaders);
-        });
+            updateMetaData() {
+                const fields = ['docNum', 'docDate', 'adminOrderNum', 'adminOrderDate', 'signerRight', 'signerLeft'];
+                fields.forEach(field => {
+                    const el = document.getElementById(field);
+                    if(el) this.data[field] = el.value.trim();
+                });
+                this.save();
+                this.renderMetaData();
+            },
 
-        // 4. بناء الجدول بأمان (تجنب innerHTML)
-        function renderTable() {
-            tbody.innerHTML = ''; // تفريغ الجدول الحالي
-            
-            invoices.forEach((inv, index) => {
-                const tr = document.createElement('tr');
+            formatDate(dateString) {
+                if (!dateString) return '';
+                const parts = dateString.split('-');
+                if(parts.length === 3) return `${parts[0]}/${parts[1]}/${parts[2]}`;
+                return dateString; 
+            },
+
+            bindUI() {
+                const fields = ['docNum', 'docDate', 'adminOrderNum', 'adminOrderDate', 'signerRight', 'signerLeft'];
+                fields.forEach(field => {
+                    const el = document.getElementById(field);
+                    if (el) {
+                        el.value = this.data[field] || '';
+                        el.addEventListener('input', () => this.updateMetaData());
+                    }
+                });
+
+                document.getElementById('addListForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addInvoice();
+                });
+
+                document.getElementById('btnPrint').addEventListener('click', () => {
+                    if (this.data.invoices.length === 0 && !confirm("لم تقم بإضافة قوائم. طباعة فارغ؟")) return;
+                    window.print();
+                });
+
+                document.getElementById('btnClear').addEventListener('click', () => {
+                    if (confirm('مسح كافة البيانات؟')) {
+                        this.data.invoices = [];
+                        this.save();
+                        this.render();
+                    }
+                });
+            },
+
+            addInvoice() {
+                const invNumInput = document.getElementById('invNum');
+                const invDateInput = document.getElementById('invDate');
+                const recDateInput = document.getElementById('recDate');
+
+                const newInvoice = {
+                    invNum: invNumInput.value.trim(),
+                    invDate: invDateInput.value.trim(),
+                    recDate: recDateInput.value.trim()
+                };
+
+                if (this.data.invoices.some(inv => inv.invNum === newInvoice.invNum)) {
+                    alert(`القائمة (${newInvoice.invNum}) مضافة مسبقاً!`);
+                    return;
+                }
+
+                this.data.invoices.push(newInvoice);
+                this.save();
+                this.renderTable();
+
+                invNumInput.value = ''; invDateInput.value = ''; recDateInput.value = '';
+                invNumInput.focus();
+            },
+
+            removeInvoice(index) {
+                if (confirm('حذف هذه القائمة؟')) {
+                    this.data.invoices.splice(index, 1);
+                    this.save();
+                    this.renderTable();
+                }
+            },
+
+            renderMetaData() {
+                document.getElementById('outNum').textContent = this.data.docNum;
+                document.getElementById('outDate').textContent = this.formatDate(this.data.docDate);
+                document.getElementById('outAdminOrderNum').textContent = this.data.adminOrderNum;
+                document.getElementById('outAdminOrderDate').textContent = this.formatDate(this.data.adminOrderDate);
+                document.getElementById('outSignerRight').textContent = this.data.signerRight;
+                document.getElementById('outSignerLeft').textContent = this.data.signerLeft;
+            },
+
+            renderTable() {
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = ''; 
+
+                this.data.invoices.forEach((invoice, index) => {
+                    const tr = document.createElement('tr');
+                    
+                    const tdIndex = document.createElement('td');
+                    tdIndex.textContent = index + 1;
+                    tr.appendChild(tdIndex);
+
+                    ['invNum', 'invDate', 'recDate'].forEach(key => {
+                        const td = document.createElement('td');
+                        td.textContent = key.includes('Date') ? this.formatDate(invoice[key]) : invoice[key];
+                        tr.appendChild(td);
+                    });
+
+                    const tdAction = document.createElement('td');
+                    tdAction.className = 'hide-on-print';
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'row-action';
+                    delBtn.innerHTML = '✖';
+                    delBtn.addEventListener('click', () => this.removeInvoice(index));
+                    
+                    tdAction.appendChild(delBtn);
+                    tr.appendChild(tdAction);
+                    tbody.appendChild(tr);
+                });
+
+                this.adjustScale();
+            },
+
+            // دالة التصغير للحفاظ على المحتوى في صفحة واحدة
+            adjustScale() {
+                const pageContent = document.getElementById('pageContent');
+                const pageArea = document.getElementById('printArea');
                 
-                // التسلسل
-                const tdIndex = document.createElement('td');
-                tdIndex.textContent = index + 1;
-                tr.appendChild(tdIndex);
+                // إعادة الحجم للطبيعي لحساب الارتفاع الفعلي
+                pageContent.style.transform = 'scale(1)';
+                
+                setTimeout(() => {
+                    // حساب الارتفاع المتاح داخل الورقة بعد خصم الهوامش العلوية والسفلية (15mm + 15mm = ~114px)
+                    const computedStyle = window.getComputedStyle(pageArea);
+                    const paddingTop = parseFloat(computedStyle.paddingTop);
+                    const paddingBottom = parseFloat(computedStyle.paddingBottom);
+                    const availableHeight = pageArea.clientHeight - paddingTop - paddingBottom;
+                    
+                    const actualHeight = pageContent.scrollHeight;
 
-                // رقم القائمة
-                const tdNum = document.createElement('td');
-                tdNum.textContent = inv.num;
-                tr.appendChild(tdNum);
+                    // إذا كان المحتوى أكبر من الصفحة، صغره ليتناسب تماماً
+                    if (actualHeight > availableHeight) {
+                        const scaleRatio = availableHeight / actualHeight;
+                        pageContent.style.transform = `scale(${scaleRatio})`;
+                    }
+                }, 10);
+            },
 
-                // تاريخ القائمة
-                const tdInvDate = document.createElement('td');
-                tdInvDate.textContent = inv.invDate;
-                tr.appendChild(tdInvDate);
-
-                // تاريخ الاستلام
-                const tdRecDate = document.createElement('td');
-                tdRecDate.textContent = inv.recDate;
-                tr.appendChild(tdRecDate);
-
-                // زر الحذف (لا يظهر في الطباعة)
-                const tdAction = document.createElement('td');
-                tdAction.className = 'no-print';
-                const delBtn = document.createElement('button');
-                delBtn.textContent = 'حذف';
-                delBtn.className = 'delete-btn';
-                delBtn.addEventListener('click', () => deleteInvoice(index));
-                tdAction.appendChild(delBtn);
-                tr.appendChild(tdAction);
-
-                tbody.appendChild(tr);
-            });
-
-            // حفظ في LocalStorage
-            localStorage.setItem('invoices', JSON.stringify(invoices));
-        }
-
-        // 5. إضافة قائمة جديدة (مع التحقق)
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // منع إعادة تحميل الصفحة
-
-            const num = document.getElementById('invNum').value.trim();
-            const invDate = document.getElementById('invDate').value;
-            const recDate = document.getElementById('recDate').value;
-
-            // التحقق من عدم تكرار رقم القائمة
-            const isDuplicate = invoices.some(inv => inv.num === num);
-            if (isDuplicate) {
-                alert('خطأ: رقم القائمة هذا موجود مسبقاً في الجدول!');
-                return;
+            render() {
+                this.renderMetaData();
+                this.renderTable();
             }
+        };
 
-            // التحقق المنطقي للتواريخ (تاريخ الاستلام لا يمكن أن يكون قبل تاريخ القائمة)
-            if(new Date(recDate) < new Date(invDate)) {
-                alert('خطأ: تاريخ الاستلام لا يمكن أن يكون أقدم من تاريخ القائمة!');
-                return;
-            }
-
-            invoices.push({ num, invDate, recDate });
-            renderTable();
-
-            // تصفير الحقول للجاهزية للإدخال التالي
-            document.getElementById('invNum').value = '';
-            document.getElementById('invNum').focus();
-        });
-
-        // 6. حذف قائمة
-        function deleteInvoice(index) {
-            if(confirm('هل أنت متأكد من حذف هذا السطر؟')) {
-                invoices.splice(index, 1);
-                renderTable();
-            }
-        }
-
-        // 7. مسح الكل
-        clearBtn.addEventListener('click', () => {
-            if(invoices.length === 0) return;
-            if(confirm('تحذير: سيتم مسح جميع البيانات من الجدول. هل أنت متأكد؟')) {
-                invoices = [];
-                renderTable();
-            }
-        });
-
-        // 8. الطباعة
-        printBtn.addEventListener('click', () => {
-            if(invoices.length === 0) {
-                alert('الجدول فارغ! يرجى إضافة بيانات قبل الطباعة.');
-                return;
-            }
-            window.print();
-        });
-
-        // التهيئة عند تحميل الصفحة
-        window.addEventListener('DOMContentLoaded', () => {
-            loadSettings();
-            renderTable();
-        });
-
+        document.addEventListener('DOMContentLoaded', () => AppState.init());
     </script>
 </body>
 </html>
